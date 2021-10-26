@@ -14,7 +14,7 @@ class Image(db.Model):
         primary_key=True,
     )
 
-    name = db.Column(
+    title = db.Column(
         db.Text,
         nullable=False
     )
@@ -26,5 +26,6 @@ class Image(db.Model):
 
     meta_data = db.Column(
         db.Text,
-        nullable=False
+        nullable=False,
+        default=""
     )

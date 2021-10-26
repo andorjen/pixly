@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Pixly Upload
+{% endblock %}
+
+{% block content %}
+<form class="form-control" method="POST" action="/upload" enctype="multipart/form-data">
+    <label for="title"> Title </label>
+    <input name="title" type="text"></input>
+    <input name="image" type="file"></input>
+    <button type="submit">Upload</button>
+</form>
+{% endblock %}
