@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Pixly Home
+{% endblock %}
+
+{% block content %}
+<h1>Pix!</h1>
+    {% for image in images %}
+    <h3> {{image.title}} </h3>
+    <img src={{image.image_url}} alt={{image.title}}>
+    {% endfor %}
+{% endblock %}
+
+

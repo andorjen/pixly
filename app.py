@@ -35,8 +35,9 @@ db.create_all()
 
 s3 = boto3.resource('s3')
 # AWS_BUCKET_URL = "https://pix.ly-eaa.s3.us-west-2.amazonaws.com/"
+AWS_OBJECT_URL = "https://s3.us-west-2.amazonaws.com/pix.ly-eaa/"
 
-AWS_BUCKET_URL = "https://pixly-alien-j.s3.us-west-1.amazonaws.com/"
+# AWS_BUCKET_URL = "https://pixly-alien-j.s3.us-west-1.amazonaws.com/"
 
 
 @app.get("/")
@@ -58,21 +59,26 @@ def add_image():
     """upload template"""
 
     user_title = request.form['title']
+    print("From /upload, image:", request.files['image'])
+    breakpoint()
     image_title = ("").join(user_title.split())
     image_id = uuid.uuid4()
 
     image_data = get_image_data(request.files['image'])
-    # print(image_data)
 
+    print(image_data)
+
+    s3.meta.client.upload_fileobj(
+        request.files['image'], "pix.ly-eaa", f"{image_title}-{image_id}", ExtraArgs={"ContentType": "image/jpeg"})
     # s3.Bucket(
-    #     'pix.ly-eaa').put_object(Key=f"{image_title}-{image_id}", Body=request.files['image'])
-    s3.Bucket(
-        'pixly-alien-j').put_object(Key=f"{image_title}-{image_id}", Body=request.files['image'])
+    #     'pix.ly-eaa').put_object(Key=f"{image_title}-{image_id}", Body=request.files['image'], ContentType="image/jpeg")
+    # s3.Bucket(
+    #     'pixly-alien-j').put_object(Key=f"{image_title}-{image_id}", Body=request.files['image'])
 
     image = Image(
         id=image_id,
         title=user_title,
-        image_url=f"{AWS_BUCKET_URL}{image_title}-{image_id}",
+        image_url=f"{AWS_OBJECT_URL}{image_title}-{image_id}",
         meta_data=str(image_data)
     )
 
@@ -80,6 +86,19 @@ def add_image():
     db.session.commit()
 
     return redirect("/")
+
+
+@app.get("/images")
+def show_all_images():
+    """renders images template"""
+    images = Image.query.all()
+
+    return render_template("images.html", images=images)
+
+
+
+
+
 
 
 def get_image_data(path):
