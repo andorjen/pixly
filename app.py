@@ -9,6 +9,9 @@ from flask import Flask, render_template, redirect, request
 from models import db, connect_db, Image
 # from forms import FormName
 
+from PIL import Image as PILImage
+from PIL.ExifTags import TAGS
+
 # uses credentials from environment
 dotenv.load_dotenv()
 
@@ -58,9 +61,14 @@ def add_image():
     image_title = ("").join(user_title.split())
     image_id = uuid.uuid4()
 
+    image_data = get_image_data(request.files['image'])
+    # image_data_str = f"{image_data}"
+    print(image_data)
+    # print(image_data_str)
+    # breakpoint()
+
     # s3.Bucket(
     #     'pix.ly-eaa').put_object(Key=f"{image_title}-{image_id}", Body=request.files['image'])
-
     s3.Bucket(
         'pixly-alien-j').put_object(Key=f"{image_title}-{image_id}", Body=request.files['image'])
 
@@ -68,10 +76,31 @@ def add_image():
         id=image_id,
         title=user_title,
         image_url=f"{AWS_BUCKET_URL}{image_title}-{image_id}",
-        meta_data="?"
+        meta_data=str(image_data)
     )
 
     db.session.add(image)
     db.session.commit()
 
     return redirect("/")
+
+
+def get_image_data(path):
+    """read metadata from a given image"""
+    # breakpoint()
+    image = PILImage.open(path)
+    exifdata = image.getexif()
+    result = {}
+    # breakpoint()
+    for tag_id in exifdata:
+        # print("in the tag_id decode")
+        # get the tag name, instead of human unreadable tag id
+        tag = TAGS.get(tag_id, tag_id)
+        data = exifdata.get(tag_id)
+        # decode bytes
+        if isinstance(data, bytes):
+            data = data.decode()
+        # print(f"{tag:25}: {data}")
+        result[tag] = data
+
+    return result
