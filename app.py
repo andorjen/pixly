@@ -62,10 +62,7 @@ def add_image():
     image_id = uuid.uuid4()
 
     image_data = get_image_data(request.files['image'])
-    # image_data_str = f"{image_data}"
-    print(image_data)
-    # print(image_data_str)
-    # breakpoint()
+    # print(image_data)
 
     # s3.Bucket(
     #     'pix.ly-eaa').put_object(Key=f"{image_title}-{image_id}", Body=request.files['image'])
