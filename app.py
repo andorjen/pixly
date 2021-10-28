@@ -36,9 +36,9 @@ db.create_all()
 
 s3 = boto3.client('s3')
 
-AWS_OBJECT_URL = "https://s3.us-west-2.amazonaws.com/pix.ly-eaa/"
+# AWS_OBJECT_URL = "https://s3.us-west-2.amazonaws.com/pix.ly-eaa/"
 
-# AWS_OBJECT_URL = "https://pixly-alien-j.s3.us-west-1.amazonaws.com/"
+AWS_OBJECT_URL = "https://pixly-alien-j.s3.us-west-1.amazonaws.com/"
 
 # importing modules
 
@@ -74,13 +74,13 @@ def add_image():
         original_file.thumbnail((400, 400))
         original_file.save('./static/resized_file.jpeg')
 
-        # s3.upload_file(
-        #     "./static/resized_file.jpeg", "pixly-alien-j", f"{image_title}-{image_id}",
-        #     ExtraArgs={"ACL": "public-read"})
-
         s3.upload_file(
-            "./static/resized_file.jpeg", "pix.ly-eaa", f"{image_title}-{image_id}",
+            "./static/resized_file.jpeg", "pixly-alien-j", f"{image_title}-{image_id}",
             ExtraArgs={"ACL": "public-read"})
+
+        # s3.upload_file(
+        #     "./static/resized_file.jpeg", "pix.ly-eaa", f"{image_title}-{image_id}",
+        #     ExtraArgs={"ACL": "public-read"})
 
         image = Image(
             id=image_id,
@@ -92,17 +92,19 @@ def add_image():
         db.session.add(image)
         db.session.commit()
 
-    return redirect("/")
+    return redirect(f"/images/{image_id}")
 
 
 @app.get("/images")
 def show_all_images():
     """renders images template"""
-    # breakpoint()
+
     if "search" in request.args.keys():
+        # breakpoint()
         search_term = request.args["search"]
         # do search
-        images = Image.query.filter(Image.__ts_vector__.match(search_term)).all()
+        images = Image.query.filter(
+            Image.__ts_vector__.match(search_term)).all()
     else:
         images = Image.query.all()
 
@@ -143,7 +145,7 @@ def edit_image(id):
         image = PILImage.open("./static/edited.jpeg")
         flipped_image = image.transpose(PILImage.FLIP_LEFT_RIGHT)
         flipped_image.save("./static/edited.jpeg")
-    
+
     if "contrast" in form_data.keys():
         image = PILImage.open("./static/edited.jpeg")
         contrast = ImageEnhance.Contrast(image)
