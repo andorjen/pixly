@@ -7,6 +7,7 @@ import boto3
 from flask_debugtoolbar import DebugToolbarExtension
 from flask import Flask, render_template, redirect, request
 from models import db, connect_db, Image
+import urllib.request
 # from forms import FormName
 # from werkzeug.utils import secure_filename
 
@@ -24,7 +25,6 @@ app.config['SQLALCHEMY_ECHO'] = True
 # comes from .env file, add to .gitignore
 MY_SECRET = os.environ['MY_SECRET']
 API_KEY = os.environ['API_SECRET_KEY']
-# AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
 
 app.config['SECRET_KEY'] = MY_SECRET
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
@@ -33,13 +33,15 @@ debug = DebugToolbarExtension(app)
 connect_db(app)
 db.create_all()
 
-
-# s3 = boto3.resource('s3')
 s3 = boto3.client('s3')
 
-# AWS_OBJECT_URL = "https://s3.us-west-2.amazonaws.com/pix.ly-eaa/"
+AWS_OBJECT_URL = "https://s3.us-west-2.amazonaws.com/pix.ly-eaa/"
 
-AWS_OBJECT_URL = "https://pixly-alien-j.s3.us-west-1.amazonaws.com/"
+# AWS_OBJECT_URL = "https://pixly-alien-j.s3.us-west-1.amazonaws.com/"
+
+## importing modules
+
+
 
 
 @app.get("/")
@@ -63,38 +65,18 @@ def add_image():
     user_title = request.form['title']
     file = request.files['image']
 
-    # data = file.read()
-
-    # breakpoint()
     image_title = ("").join(user_title.split())
     image_id = uuid.uuid4()
     image_data = get_image_data(file)
 
-    print(image_data)
-
-    # s3.meta.client.upload_fileobj(
-    #     file, "pix.ly-eaa", f"{image_title}-{image_id}", ExtraArgs={"ContentType": "image/jpeg"})
-    # breakpoint()
     file.seek(0)
-    result = s3.upload_fileobj(
-        file, "pixly-alien-j", f"{image_title}-{image_id}",
+    # result = s3.upload_fileobj(
+    #     file, "pixly-alien-j", f"{image_title}-{image_id}",
+    #     ExtraArgs={"ACL": "public-read"})
+
+    s3.upload_fileobj(
+        file, "pix.ly-eaa", f"{image_title}-{image_id}",
         ExtraArgs={"ACL": "public-read"})
-
-    #  secure_filename(file.filename)
-    # result = s3.upload_file(
-    #     secure_filename(
-    #         file.filename), "pixly-alien-j", f"{image_title}-{image_id}",
-    #     ExtraArgs={"ContentType": file.content_type, "ACL": "public-read"})
-
-    print("after upload", result)
-
-    # ExtraArgs={"Metadata": {"ContentType": "image/jpeg"}}
-    # s3.meta.client.upload_fileobj(
-    #     file, "pixly-alien-j", f"{image_title}-{image_id}", ExtraArgs={"ContentType": "image/jpeg"})
-    # s3.Bucket(
-    #     'pix.ly-eaa').put_object(Key=f"{image_title}-{image_id}", Body=file, ContentType="image/jpeg")
-    # s3.Bucket(
-    #     # 'pixly-alien-j').put_object(Key=f"{image_title}-{image_id}", Body=file)
 
     image = Image(
         id=image_id,
@@ -115,6 +97,29 @@ def show_all_images():
     images = Image.query.all()
 
     return render_template("images.html", images=images)
+
+@app.route("/images/<id>", methods= ['POST', 'GET'])
+def show_image(id):
+    """renders images template"""
+    image_data = Image.query.get_or_404(id)   
+    urllib.request.urlretrieve(image_data.image_url,"./static/original.jpeg")
+    urllib.request.urlretrieve(image_data.image_url,"./static/edited.jpeg")
+
+    if request.method == 'POST':
+        breakpoint()
+        if request.form["filter"]:
+            image = PILImage.open("./static/edited.jpeg")
+
+            image_rot_90 = image.convert('L')
+            image_rot_90.save("./static/edited.jpeg")
+        elif (request.form["rotate"]):
+            image = PILImage.open("./static/edited.jpeg")
+
+            image_rot_90 = image.rotate(90)
+            image_rot_90.save("./static/edited.jpeg")
+
+    return render_template("image.html", image=image_data)
+
 
 
 def get_image_data(path):

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Pixly Home
+{% endblock %}
+
+{% block content %}
+<h1>{{image.title}}</h1>
+<img src={{image.image_url}} alt={{image.title}}>
+
+<form action="/images/{{image.id}}" method="POST">
+    <input type="radio" name="filter"> B&W</input >
+    <button>submit</button>
+</form>
+<form action="/images/{{image.id}}" method="POST">
+    <input type="radio" name="rotate"> Rotate</input >
+    <button>submit</button>
+</form>
+
+<h1>Edited image</h1>
+<img src= "../static/edited.jpeg" alt={{image.title}}>
+{% endblock %}
