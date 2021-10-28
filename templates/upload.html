@@ -7,8 +7,8 @@ Pixly Upload
 {% block content %}
 <form class="form-control" method="POST" action="/upload" enctype="multipart/form-data">
     <label for="title"> Title </label>
-    <input name="title" type="text"></input>
-    <input name="image" type="file"></input>
+    <input name="title" type="text" required></input>
+    <input name="image" type="file" required></input>
     <button type="submit">Upload</button>
 </form>
 {% endblock %}

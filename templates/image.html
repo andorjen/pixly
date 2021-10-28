@@ -6,17 +6,22 @@ Pixly Home
 
 {% block content %}
 <h1>{{image.title}}</h1>
-<img src={{image.image_url}} alt={{image.title}}>
+<a href={{image.image_url}}>
+    <img src={{image.image_url}} alt={{image.title}}>
+</a>
 
+
+
+<h1>Edit the Photo Here</h1>
 <form action="/images/{{image.id}}" method="POST">
-    <input type="radio" name="filter"> B&W</input >
+    <input type="checkbox" name="filter">B&W</input>
+    <input type="checkbox" name="rotate">Rotate</input>
+    <input type="checkbox" name="mirror">Flip</input>
+    <input type="checkbox" name="revert">Revert to Original</input>
     <button>submit</button>
 </form>
-<form action="/images/{{image.id}}" method="POST">
-    <input type="radio" name="rotate"> Rotate</input >
-    <button>submit</button>
-</form>
 
-<h1>Edited image</h1>
-<img src= "../static/edited.jpeg" alt={{image.title}}>
+<a href="../static/edited.jpeg">
+    <img src="../static/edited.jpeg" alt={{image.title}}>
+</a>
 {% endblock %}

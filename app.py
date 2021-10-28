@@ -35,13 +35,11 @@ db.create_all()
 
 s3 = boto3.client('s3')
 
-AWS_OBJECT_URL = "https://s3.us-west-2.amazonaws.com/pix.ly-eaa/"
+# AWS_OBJECT_URL = "https://s3.us-west-2.amazonaws.com/pix.ly-eaa/"
 
-# AWS_OBJECT_URL = "https://pixly-alien-j.s3.us-west-1.amazonaws.com/"
+AWS_OBJECT_URL = "https://pixly-alien-j.s3.us-west-1.amazonaws.com/"
 
-## importing modules
-
-
+# importing modules
 
 
 @app.get("/")
@@ -64,29 +62,34 @@ def add_image():
 
     user_title = request.form['title']
     file = request.files['image']
+    if file:
+        image_title = ("").join(user_title.split())
+        image_id = uuid.uuid4()
+        image_data = get_image_data(file)
 
-    image_title = ("").join(user_title.split())
-    image_id = uuid.uuid4()
-    image_data = get_image_data(file)
+        file.seek(0)
+        # breakpoint()
+        original_file = PILImage.open(file)
+        original_file.thumbnail((400, 400))
+        original_file.save('./static/resized_file.jpeg')
 
-    file.seek(0)
-    # result = s3.upload_fileobj(
-    #     file, "pixly-alien-j", f"{image_title}-{image_id}",
-    #     ExtraArgs={"ACL": "public-read"})
+        s3.upload_file(
+            "./static/resized_file.jpeg", "pixly-alien-j", f"{image_title}-{image_id}",
+            ExtraArgs={"ACL": "public-read"})
 
-    s3.upload_fileobj(
-        file, "pix.ly-eaa", f"{image_title}-{image_id}",
-        ExtraArgs={"ACL": "public-read"})
+        # s3.upload_file(
+        #     "./static/resized_file.jpeg", "pix.ly-eaa", f"{image_title}-{image_id}",
+        #     ExtraArgs={"ACL": "public-read"})
 
-    image = Image(
-        id=image_id,
-        title=user_title,
-        image_url=f"{AWS_OBJECT_URL}{image_title}-{image_id}",
-        meta_data=str(image_data)
-    )
+        image = Image(
+            id=image_id,
+            title=user_title,
+            image_url=f"{AWS_OBJECT_URL}{image_title}-{image_id}",
+            meta_data=str(image_data)
+        )
 
-    db.session.add(image)
-    db.session.commit()
+        db.session.add(image)
+        db.session.commit()
 
     return redirect("/")
 
@@ -98,28 +101,46 @@ def show_all_images():
 
     return render_template("images.html", images=images)
 
-@app.route("/images/<id>", methods= ['POST', 'GET'])
+
+@app.get("/images/<id>")
 def show_image(id):
     """renders images template"""
-    image_data = Image.query.get_or_404(id)   
-    urllib.request.urlretrieve(image_data.image_url,"./static/original.jpeg")
-    urllib.request.urlretrieve(image_data.image_url,"./static/edited.jpeg")
 
-    if request.method == 'POST':
-        breakpoint()
-        if request.form["filter"]:
-            image = PILImage.open("./static/edited.jpeg")
-
-            image_rot_90 = image.convert('L')
-            image_rot_90.save("./static/edited.jpeg")
-        elif (request.form["rotate"]):
-            image = PILImage.open("./static/edited.jpeg")
-
-            image_rot_90 = image.rotate(90)
-            image_rot_90.save("./static/edited.jpeg")
+    image_data = Image.query.get_or_404(id)
+    urllib.request.urlretrieve(image_data.image_url, "./static/original.jpeg")
+    urllib.request.urlretrieve(image_data.image_url, "./static/edited.jpeg")
 
     return render_template("image.html", image=image_data)
 
+
+@app.post("/images/<id>")
+def edit_image(id):
+    """sends post request to edit an image"""
+    image_data = Image.query.get_or_404(id)
+    form_data = request.form.to_dict()
+    # breakpoint()
+    # if request.form["filter"]:
+    if "filter" in form_data.keys():
+        image = PILImage.open("./static/edited.jpeg")
+
+        image_rot_90 = image.convert('L')
+        image_rot_90.save("./static/edited.jpeg")
+
+    if "rotate" in form_data.keys():
+        image = PILImage.open("./static/edited.jpeg")
+
+        image_rot_90 = image.rotate(90)
+        image_rot_90.save("./static/edited.jpeg")
+
+    if "mirror" in form_data.keys():
+        image = PILImage.open("./static/edited.jpeg")
+        flipped_image = image.transpose(PILImage.FLIP_LEFT_RIGHT)
+        flipped_image.save("./static/edited.jpeg")
+
+    if "revert" in form_data.keys():
+        urllib.request.urlretrieve(
+            image_data.image_url, "./static/edited.jpeg")
+    return render_template("image.html", image=image_data)
 
 
 def get_image_data(path):
