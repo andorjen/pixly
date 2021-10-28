@@ -6,6 +6,10 @@ Pixly Home
 
 {% block content %}
 <h1>Pix!</h1>
+<form action="/images">
+    <input name="search" type="text"/>
+    <button>Search</button>
+</form>
 {% for image in images %}
 <a href="/images/{{image.id}}">
     <h3> {{image.title}} </h3>

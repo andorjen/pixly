@@ -12,6 +12,7 @@ import urllib.request
 # from werkzeug.utils import secure_filename
 
 from PIL import Image as PILImage
+from PIL import ImageEnhance
 from PIL.ExifTags import TAGS
 
 # uses credentials from environment
@@ -35,9 +36,9 @@ db.create_all()
 
 s3 = boto3.client('s3')
 
-# AWS_OBJECT_URL = "https://s3.us-west-2.amazonaws.com/pix.ly-eaa/"
+AWS_OBJECT_URL = "https://s3.us-west-2.amazonaws.com/pix.ly-eaa/"
 
-AWS_OBJECT_URL = "https://pixly-alien-j.s3.us-west-1.amazonaws.com/"
+# AWS_OBJECT_URL = "https://pixly-alien-j.s3.us-west-1.amazonaws.com/"
 
 # importing modules
 
@@ -73,13 +74,13 @@ def add_image():
         original_file.thumbnail((400, 400))
         original_file.save('./static/resized_file.jpeg')
 
-        s3.upload_file(
-            "./static/resized_file.jpeg", "pixly-alien-j", f"{image_title}-{image_id}",
-            ExtraArgs={"ACL": "public-read"})
-
         # s3.upload_file(
-        #     "./static/resized_file.jpeg", "pix.ly-eaa", f"{image_title}-{image_id}",
+        #     "./static/resized_file.jpeg", "pixly-alien-j", f"{image_title}-{image_id}",
         #     ExtraArgs={"ACL": "public-read"})
+
+        s3.upload_file(
+            "./static/resized_file.jpeg", "pix.ly-eaa", f"{image_title}-{image_id}",
+            ExtraArgs={"ACL": "public-read"})
 
         image = Image(
             id=image_id,
@@ -97,7 +98,13 @@ def add_image():
 @app.get("/images")
 def show_all_images():
     """renders images template"""
-    images = Image.query.all()
+    # breakpoint()
+    if "search" in request.args.keys():
+        search_term = request.args["search"]
+        # do search
+        images = Image.query.filter(Image.__ts_vector__.match(search_term)).all()
+    else:
+        images = Image.query.all()
 
     return render_template("images.html", images=images)
 
@@ -136,6 +143,11 @@ def edit_image(id):
         image = PILImage.open("./static/edited.jpeg")
         flipped_image = image.transpose(PILImage.FLIP_LEFT_RIGHT)
         flipped_image.save("./static/edited.jpeg")
+    
+    if "contrast" in form_data.keys():
+        image = PILImage.open("./static/edited.jpeg")
+        contrast = ImageEnhance.Contrast(image)
+        contrast.enhance(1.5).save("./static/edited.jpeg")
 
     if "revert" in form_data.keys():
         urllib.request.urlretrieve(
