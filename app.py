@@ -12,7 +12,7 @@ import urllib.request
 # from werkzeug.utils import secure_filename
 
 from PIL import Image as PILImage
-from PIL import ImageEnhance
+from PIL import ImageEnhance, ImageOps
 from PIL.ExifTags import TAGS
 
 # uses credentials from environment
@@ -156,6 +156,11 @@ def edit_image(id):
         image = PILImage.open("./static/edited.jpeg")
         contrast = ImageEnhance.Contrast(image)
         contrast.enhance(1.5).save("./static/edited.jpeg")
+        
+    if "border" in form_data.keys():
+        image = PILImage.open("./static/edited.jpeg")
+        border_image = ImageOps.expand(image, border=(10, 10, 10, 10), fill="black")
+        border_image.save("./static/edited.jpeg")
 
     if "revert" in form_data.keys():
         urllib.request.urlretrieve(
