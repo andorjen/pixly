@@ -63,23 +63,26 @@ def add_image():
 
     user_title = request.form['title']
     file = request.files['image']
-    if file:
+    file_types = ["image/jpg", "image/png", "image/jpeg"]
+    file_ext = file.mimetype.replace("image/", "")
+    if file and (file.mimetype in file_types):
+        # breakpoint()
         image_title = ("").join(user_title.split())
         image_id = uuid.uuid4()
         image_data = get_image_data(file)
 
         file.seek(0)
-        # breakpoint()
+
         original_file = PILImage.open(file)
         original_file.thumbnail((400, 400))
-        original_file.save('./static/resized_file.jpeg')
+        original_file.save(f"./static/resized_file.{file_ext}")
 
         s3.upload_file(
-            "./static/resized_file.jpeg", "pixly-alien-j", f"{image_title}-{image_id}",
+            f"./static/resized_file.{file_ext}", "pixly-alien-j", f"{image_title}-{image_id}",
             ExtraArgs={"ACL": "public-read"})
 
         # s3.upload_file(
-        #     "./static/resized_file.jpeg", "pix.ly-eaa", f"{image_title}-{image_id}",
+        #     f"./static/resized_file.{file_ext}", "pix.ly-eaa", f"{image_title}-{image_id}",
         #     ExtraArgs={"ACL": "public-read"})
 
         image = Image(
@@ -91,8 +94,9 @@ def add_image():
 
         db.session.add(image)
         db.session.commit()
+        return redirect(f"/images/{image_id}")
 
-    return redirect(f"/images/{image_id}")
+    return redirect("/images")
 
 
 @app.get("/images")
@@ -100,11 +104,13 @@ def show_all_images():
     """renders images template"""
 
     if "search" in request.args.keys():
-        # breakpoint()
+
         search_term = request.args["search"]
+        alnum_search_term = ''.join(e for e in search_term if e.isalnum())
+        # breakpoint()
         # do search
         images = Image.query.filter(
-            Image.__ts_vector__.match(search_term)).all()
+            Image.__ts_vector__.match(alnum_search_term)).all()
     else:
         images = Image.query.all()
 
