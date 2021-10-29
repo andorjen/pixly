@@ -12,17 +12,17 @@ Pixly Home
             <input type="search" name="search" id="search-form" class="form-control" />
         </div>
         <button type="button" class="btn btn-primary">
-            Search
+            <i class="fas fa-search"> Search</i>
         </button>
     </div>
 </form>
 <div class="row">
     {% for image in images %}
     <div class="col-lg-4 col-md-6 col-12 p-2">
-        <a style="text-decoration: none; color: black;" href="/images/{{image.id}}">
+        <a href="/images/{{image.id}}">
             <div class="card">
                 <div class="card-body">
-                    <p style="font-size: x-large;" class="card-text">{{image.title}}</p>
+                    <p class="card-text">{{image.title}}</p>
                 </div>
                 <img class="card-img-top" src="{{image.image_url}}" alt={{image.title}}>
             </div>

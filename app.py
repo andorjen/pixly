@@ -19,7 +19,8 @@ from PIL.ExifTags import TAGS
 dotenv.load_dotenv()
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///pixly'
+app.config['SQLALCHEMY_DATABASE_URI'] = (
+    os.environ['DATABASE_URL'].replace("postgres://", "postgresql://"))
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
@@ -36,9 +37,9 @@ db.create_all()
 
 s3 = boto3.client('s3')
 
-AWS_OBJECT_URL = "https://s3.us-west-2.amazonaws.com/pix.ly-eaa/"
+# AWS_OBJECT_URL = "https://s3.us-west-2.amazonaws.com/pix.ly-eaa/"
 
-# AWS_OBJECT_URL = "https://pixly-alien-j.s3.us-west-1.amazonaws.com/"
+AWS_OBJECT_URL = "https://pixly-alien-j.s3.us-west-1.amazonaws.com/"
 
 # importing modules
 
@@ -77,13 +78,13 @@ def add_image():
         original_file.thumbnail((400, 400))
         original_file.save(f"./static/resized_file.{file_ext}")
 
-        # s3.upload_file(
-        #     f"./static/resized_file.{file_ext}", "pixly-alien-j", f"{image_title}-{image_id}",
-        #     ExtraArgs={"ACL": "public-read"})
-
         s3.upload_file(
-            f"./static/resized_file.{file_ext}", "pix.ly-eaa", f"{image_title}-{image_id}",
+            f"./static/resized_file.{file_ext}", "pixly-alien-j", f"{image_title}-{image_id}",
             ExtraArgs={"ACL": "public-read"})
+
+        # s3.upload_file(
+        #     f"./static/resized_file.{file_ext}", "pix.ly-eaa", f"{image_title}-{image_id}",
+        #     ExtraArgs={"ACL": "public-read"})
 
         image = Image(
             id=image_id,
@@ -156,10 +157,11 @@ def edit_image(id):
         image = PILImage.open("./static/edited.jpeg")
         contrast = ImageEnhance.Contrast(image)
         contrast.enhance(1.5).save("./static/edited.jpeg")
-        
+
     if "border" in form_data.keys():
         image = PILImage.open("./static/edited.jpeg")
-        border_image = ImageOps.expand(image, border=(10, 10, 10, 10), fill="black")
+        border_image = ImageOps.expand(
+            image, border=(10, 10, 10, 10), fill="black")
         border_image.save("./static/edited.jpeg")
 
     if "revert" in form_data.keys():
