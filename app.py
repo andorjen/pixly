@@ -1,5 +1,6 @@
 import os
 import dotenv
+import shutil
 
 import uuid
 import boto3
@@ -8,19 +9,18 @@ from flask_debugtoolbar import DebugToolbarExtension
 from flask import Flask, render_template, redirect, request
 from models import db, connect_db, Image
 import urllib.request
-# from forms import FormName
-# from werkzeug.utils import secure_filename
+
 
 from PIL import Image as PILImage
 from PIL import ImageEnhance, ImageOps
 from PIL.ExifTags import TAGS
 
-# uses credentials from environment
 dotenv.load_dotenv()
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = (
     os.environ['DATABASE_URL'].replace("postgres://", "postgresql://"))
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
@@ -41,8 +41,6 @@ s3 = boto3.client('s3')
 
 AWS_OBJECT_URL = "https://pixly-alien-j.s3.us-west-1.amazonaws.com/"
 
-# importing modules
-
 
 @app.get("/")
 def show_homepage():
@@ -60,14 +58,15 @@ def show_upload_page():
 
 @app.post("/upload")
 def add_image():
-    """upload template"""
+    """upload image to s3, and redirect to edit page on successful upload, 
+    otherwise redirect to show all images"""
 
     user_title = request.form['title']
     file = request.files['image']
     file_types = ["image/jpg", "image/png", "image/jpeg"]
     file_ext = file.mimetype.replace("image/", "")
     if file and (file.mimetype in file_types):
-        # breakpoint()
+
         image_title = ("").join(user_title.split())
         image_id = uuid.uuid4()
         image_data = get_image_data(file)
@@ -108,8 +107,7 @@ def show_all_images():
 
         search_term = request.args["search"]
         alnum_search_term = ''.join(e for e in search_term if e.isalnum())
-        # breakpoint()
-        # do search
+
         images = Image.query.filter(
             Image.__ts_vector__.match(alnum_search_term)).all()
     else:
@@ -120,11 +118,21 @@ def show_all_images():
 
 @app.get("/images/<id>")
 def show_image(id):
-    """renders images template"""
+    """renders page to edit an image"""
 
     image_data = Image.query.get_or_404(id)
-    urllib.request.urlretrieve(image_data.image_url, "./static/original.jpeg")
-    urllib.request.urlretrieve(image_data.image_url, "./static/edited.jpeg")
+
+    newpath = f"./static/{id}"
+
+    if not os.path.exists(newpath):
+
+        shutil.rmtree("./static")
+        os.makedirs("./static")
+        os.makedirs(newpath)
+        urllib.request.urlretrieve(
+            image_data.image_url, f"./static/{id}/original.jpeg")
+        urllib.request.urlretrieve(
+            image_data.image_url, f"./static/{id}/edited.jpeg")
 
     return render_template("image.html", image=image_data)
 
@@ -134,40 +142,43 @@ def edit_image(id):
     """sends post request to edit an image"""
     image_data = Image.query.get_or_404(id)
     form_data = request.form.to_dict()
-    # breakpoint()
-    # if request.form["filter"]:
+
     if "filter" in form_data.keys():
-        image = PILImage.open("./static/edited.jpeg")
+        image = PILImage.open(f"./static/{id}/edited.jpeg")
 
         image_rot_90 = image.convert('L')
-        image_rot_90.save("./static/edited.jpeg")
+        image_rot_90.save(f"./static/{id}/edited.jpeg")
 
     if "rotate" in form_data.keys():
-        image = PILImage.open("./static/edited.jpeg")
+        image = PILImage.open(f"./static/{id}/edited.jpeg")
 
-        image_rot_90 = image.rotate(90)
-        image_rot_90.save("./static/edited.jpeg")
+        image_rot_90 = image.rotate(90, expand=True)
+        image_rot_90.save(f"./static/{id}/edited.jpeg")
 
     if "mirror" in form_data.keys():
-        image = PILImage.open("./static/edited.jpeg")
+        image = PILImage.open(f"./static/{id}/edited.jpeg")
         flipped_image = image.transpose(PILImage.FLIP_LEFT_RIGHT)
-        flipped_image.save("./static/edited.jpeg")
+        flipped_image.save(f"./static/{id}/edited.jpeg")
 
     if "contrast" in form_data.keys():
-        image = PILImage.open("./static/edited.jpeg")
+        image = PILImage.open(f"./static/{id}/edited.jpeg")
         contrast = ImageEnhance.Contrast(image)
-        contrast.enhance(1.5).save("./static/edited.jpeg")
+        contrast.enhance(1.5).save(f"./static/{id}/edited.jpeg")
 
     if "border" in form_data.keys():
-        image = PILImage.open("./static/edited.jpeg")
+        image = PILImage.open(f"./static/{id}/edited.jpeg")
         border_image = ImageOps.expand(
             image, border=(10, 10, 10, 10), fill="black")
-        border_image.save("./static/edited.jpeg")
+        border_image.save(f"./static/{id}/edited.jpeg")
 
     if "revert" in form_data.keys():
         urllib.request.urlretrieve(
-            image_data.image_url, "./static/edited.jpeg")
-    return render_template("image.html", image=image_data)
+            image_data.image_url, f"./static/{id}/edited.jpeg")
+
+    return redirect(f"/images/{id}")
+
+
+############################# HELPER FUNCTIONS #######################################################################
 
 
 def get_image_data(path):
@@ -185,8 +196,13 @@ def get_image_data(path):
         # decode bytes
         if isinstance(data, bytes):
             data = data.decode()
-        # print(f"{tag:25}: {data}")
         result[tag] = data
 
     return result
+
+############################# FURTHER STUDIES #######################################################################
+# frontend js, ajax request
+# add revert back one step feature
+# allow more customizable edits with simple image
+# add tags for images for full text search
 # pillow image open context manager : with

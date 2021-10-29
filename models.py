@@ -35,8 +35,8 @@ class Image(db.Model):
     __ts_vector__ = db.Column(
         TSVector(),
         db.Computed(
-        "to_tsvector('english', title || ' ' || meta_data)",
-        persisted=True))
+            "to_tsvector('english', title || ' ' || meta_data)",
+            persisted=True))
 
     __table_args__ = (Index(
         'ix_image___ts_vector__',

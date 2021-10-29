@@ -31,9 +31,10 @@ Pixly Home
 
     <button class="btn btn-outline-dark">submit</button>
 </form>
-<div style="justify-content: center; display: flex; width: 100%; background-color: white; border: 1px solid lightgrey; border-radius: 6px;" >
-    <a href="../static/edited.jpeg" download>
-        <img style="margin-top: 10%; margin-bottom: 10%;" src="../static/edited.jpeg" alt={{image.title}}>
+<div
+    style="justify-content: center; display: flex; width: 100%; background-color: white; border: 1px solid lightgrey; border-radius: 6px;">
+    <a href="../static/{{image.id}}/edited.jpeg" download>
+        <img style="margin-top: 10%; margin-bottom: 10%;" src="../static/{{image.id}}/edited.jpeg" alt={{image.title}}>
     </a>
 </div>
 
