@@ -137,41 +137,41 @@ def show_image(id):
     return render_template("image.html", image=image_data)
 
 
-@app.post("/images/<id>")
-def edit_image(id):
+@app.get("/images/<id>/<action>")
+def edit_image(id, action):
     """sends post request to edit an image"""
     image_data = Image.query.get_or_404(id)
-    form_data = request.form.to_dict()
+    # form_data = request.form.to_dict()
 
-    if "filter" in form_data.keys():
+    if action == "filter":
         image = PILImage.open(f"./static/{id}/edited.jpeg")
 
         image_rot_90 = image.convert('L')
         image_rot_90.save(f"./static/{id}/edited.jpeg")
 
-    if "rotate" in form_data.keys():
+    if action == "rotate":
         image = PILImage.open(f"./static/{id}/edited.jpeg")
 
         image_rot_90 = image.rotate(90, expand=True)
         image_rot_90.save(f"./static/{id}/edited.jpeg")
 
-    if "mirror" in form_data.keys():
+    if action == "mirror":
         image = PILImage.open(f"./static/{id}/edited.jpeg")
         flipped_image = image.transpose(PILImage.FLIP_LEFT_RIGHT)
         flipped_image.save(f"./static/{id}/edited.jpeg")
 
-    if "contrast" in form_data.keys():
+    if action == "contrast":
         image = PILImage.open(f"./static/{id}/edited.jpeg")
         contrast = ImageEnhance.Contrast(image)
         contrast.enhance(1.5).save(f"./static/{id}/edited.jpeg")
 
-    if "border" in form_data.keys():
+    if action == "border":
         image = PILImage.open(f"./static/{id}/edited.jpeg")
         border_image = ImageOps.expand(
             image, border=(10, 10, 10, 10), fill="black")
         border_image.save(f"./static/{id}/edited.jpeg")
 
-    if "revert" in form_data.keys():
+    if action == "revert":
         urllib.request.urlretrieve(
             image_data.image_url, f"./static/{id}/edited.jpeg")
 

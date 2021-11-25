@@ -10,7 +10,7 @@ Pixly Home
 
 
 <h4>Edit the Photo Here: Click to download</h4>
-<form action="/images/{{image.id}}" class="form-control" method="POST">
+<!-- <form action="/images/{{image.id}}" class="form-control" method="POST">
     <input class="form-check-input mt-2" type="checkbox" id="filter" name="filter"></input>
     <label class="form-check-label" for="filter"> Black & White</label>
 
@@ -30,12 +30,50 @@ Pixly Home
     <label class="form-check-label" for="revert"> Revert to Original</label>
 
     <button class="btn btn-outline-dark">submit</button>
-</form>
+</form> -->
+
 <div
-    style="justify-content: center; display: flex; width: 100%; background-color: white; border: 1px solid lightgrey; border-radius: 6px;">
-    <a href="../static/{{image.id}}/edited.jpeg" download>
-        <img style="margin-top: 10%; margin-bottom: 10%;" src="../static/{{image.id}}/edited.jpeg" alt={{image.title}}>
-    </a>
+    style="justify-content: center; display: flex; width: 100%; text-align:center; background-color: white; border: 1px solid lightgrey; border-radius: 6px;">
+    <div class="row mt-3">
+        <div class="col-12">
+            <div class="d-inline-block">
+                <form action="/images/{{image.id}}/filter">
+                    <button name="filter" value="true" class="btn btn-outline-dark">Black & White</button>
+                </form>
+            </div>
+            <div class="d-inline-block">
+                <form action="/images/{{image.id}}/rotate">
+                    <button name="rotate" value="true" class="btn btn-outline-dark">Rotate</button>
+                </form>
+            </div>
+            <div class="d-inline-block">
+                <form action="/images/{{image.id}}/mirror">
+                    <button name="mirror" value="true" class="btn btn-outline-dark">Mirror</button>
+                </form>
+            </div>
+            <div class="d-inline-block">
+                <form action="/images/{{image.id}}/contrast">
+                    <button name="contrast" value="true" class="btn btn-outline-dark">Contrast</button>
+                </form>
+            </div>
+            <div class="d-inline-block">
+                <form action="/images/{{image.id}}/border">
+                    <button name="border" value="true" class="btn btn-outline-dark">Border</button>
+                </form>
+            </div>
+            <div class="d-inline-block">
+                <form action="/images/{{image.id}}/revert">
+                    <button name="revert" value="true" class="btn btn-outline-success">Revert</button>
+                </form>
+            </div>
+        </div>
+        <div class="col-12">
+            <a href="../static/{{image.id}}/edited.jpeg" download>
+                <img style="margin-top: 5%; margin-bottom: 5%;" src="../static/{{image.id}}/edited.jpeg"
+                    alt={{image.title}}>
+            </a>
+        </div>
+    </div>
 </div>
 
 {% endblock %}
