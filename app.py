@@ -124,6 +124,7 @@ def show_image(id):
     newpath = f"./temp/{id}"
 
     debug
+
     if not os.path.exists(newpath):
 
         shutil.rmtree("./temp")
