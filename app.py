@@ -37,8 +37,6 @@ db.create_all()
 
 s3 = boto3.client('s3')
 
-# AWS_OBJECT_URL = "https://s3.us-west-2.amazonaws.com/pix.ly-eaa/"
-
 AWS_OBJECT_URL = "https://pixly-alien-j.s3.us-west-1.amazonaws.com/"
 
 
