@@ -42,3 +42,27 @@ body {
     padding: 6px;
     border-radius: 4px;
 }
+
+.edit-container{
+    padding: 30px;
+    text-align: center;
+    width: 70%;
+    margin-left: 15%;
+   
+}
+.edit-title{
+    background-color: rgba(255, 255, 255,0.4);
+    padding: 5px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+.edit-window{
+    justify-content: center; 
+    display: flex; 
+    width: 100%; 
+    text-align:center; 
+    background-color: rgba(255, 255, 255,0.8);
+    border: 1px solid lightgrey; 
+    border-radius: 6px;
+}

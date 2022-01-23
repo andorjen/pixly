@@ -6,11 +6,17 @@ Pixly Home
 
 {% block content %}
 
-<h1>{{image.title}}</h1>
+<div class="edit-container">
+
+    <div class="edit-title">
 
 
-<h4>Edit the Photo Here: Click to download</h4>
-<!-- <form action="/images/{{image.id}}" class="form-control" method="POST">
+        <h1>{{image.title}}</h1>
+
+
+        <h4>Edit the Photo Here: Click to download</h4>
+    </div>
+    <!-- <form action="/images/{{image.id}}" class="form-control" method="POST">
     <input class="form-check-input mt-2" type="checkbox" id="filter" name="filter"></input>
     <label class="form-check-label" for="filter"> Black & White</label>
 
@@ -32,48 +38,47 @@ Pixly Home
     <button class="btn btn-outline-dark">submit</button>
 </form> -->
 
-<div
-    style="justify-content: center; display: flex; width: 100%; text-align:center; background-color: white; border: 1px solid lightgrey; border-radius: 6px;">
-    <div class="row mt-3">
-        <div class="col-12">
-            <div class="d-inline-block">
-                <form>
-                    <button name="filter" value="true" class="btn btn-outline-dark">Black & White</button>
-                </form>
+    <div class="edit-window">
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="d-inline-block">
+                    <form>
+                        <button name="filter" value="true" class="btn btn-outline-dark">Black & White</button>
+                    </form>
+                </div>
+                <div class="d-inline-block">
+                    <form>
+                        <button name="rotate" value="true" class="btn btn-outline-dark">Rotate</button>
+                    </form>
+                </div>
+                <div class="d-inline-block">
+                    <form>
+                        <button name="mirror" value="true" class="btn btn-outline-dark">Mirror</button>
+                    </form>
+                </div>
+                <div class="d-inline-block">
+                    <form>
+                        <button name="contrast" value="true" class="btn btn-outline-dark">Contrast</button>
+                    </form>
+                </div>
+                <div class="d-inline-block">
+                    <form>
+                        <button name="border" value="true" class="btn btn-outline-dark">Border</button>
+                    </form>
+                </div>
+                <div class="d-inline-block">
+                    <form>
+                        <button name="revert" value="true" class="btn btn-outline-success">Revert</button>
+                    </form>
+                </div>
             </div>
-            <div class="d-inline-block">
-                <form>
-                    <button name="rotate" value="true" class="btn btn-outline-dark">Rotate</button>
-                </form>
+            <div class="col-12">
+                <a href="../static/temp/{{image.id}}/edited.jpeg" download>
+                    <img style="margin-top: 5%; margin-bottom: 5%;" src="../static/temp/{{image.id}}/edited.jpeg"
+                        alt={{image.title}}>
+                </a>
             </div>
-            <div class="d-inline-block">
-                <form>
-                    <button name="mirror" value="true" class="btn btn-outline-dark">Mirror</button>
-                </form>
-            </div>
-            <div class="d-inline-block">
-                <form>
-                    <button name="contrast" value="true" class="btn btn-outline-dark">Contrast</button>
-                </form>
-            </div>
-            <div class="d-inline-block">
-                <form>
-                    <button name="border" value="true" class="btn btn-outline-dark">Border</button>
-                </form>
-            </div>
-            <div class="d-inline-block">
-                <form>
-                    <button name="revert" value="true" class="btn btn-outline-success">Revert</button>
-                </form>
-            </div>
-        </div>
-        <div class="col-12">
-            <a href="../static/temp/{{image.id}}/edited.jpeg" download>
-                <img style="margin-top: 5%; margin-bottom: 5%;" src="../static/temp/{{image.id}}/edited.jpeg"
-                    alt={{image.title}}>
-            </a>
         </div>
     </div>
 </div>
-
 {% endblock %}
