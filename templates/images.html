@@ -5,31 +5,35 @@ Pixly Home
 {% endblock %}
 
 {% block content %}
-<h1>Pix!</h1>
-<form action="/images">
-    <div class="input-group">
-        <div class="form-outline">
-            <input type="search" name="search" id="search-form" class="form-control" />
-        </div>
-        <button type="button" class="btn btn-primary">
-            <i class="fas fa-search"> Search</i>
-        </button>
-    </div>
-</form>
-<div class="row">
-    {% for image in images %}
-    <div class="col-lg-4 col-md-6 col-12 p-2">
-        <a href="/images/{{image.id}}">
-            <div class="card">
-                <div class="card-body">
-                    <p class="card-text">{{image.title}}</p>
+<div class="images-page">
+    <div class="images-form">
+        <h1>Pix!</h1>
+        <form action="/images">
+            <div class="input-group">
+                <div class="form-outline">
+                    <input type="search" name="search" id="search-form" class="form-control" />
                 </div>
-                <img class="card-img-top" src="{{image.image_url}}" alt={{image.title}}>
+                <button type="button" class="btn btn-primary">
+                    <i class="fas fa-search"> Search</i>
+                </button>
             </div>
-        </a>
+        </form>
     </div>
-    {% endfor %}
-</div>
 
+    <div class="images-container">
+        {% for image in images %}
+        <div class="image-card">
+            <a href="/images/{{image.id}}" class="image-title">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-text">{{image.title}}</p>
+                    </div>
+                    <img class="card-img-top" src="{{image.image_url}}" alt={{image.title}}>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 
 {% endblock %}

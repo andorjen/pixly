@@ -5,20 +5,28 @@ Pixly Upload
 {% endblock %}
 
 {% block content %}
-<h2>Upload a new photo</h2>
-<form class="form-control" style="margin-top: 3%;" method="POST" action="/upload" enctype="multipart/form-data">
-    <div class="row">
-        <div class="input-group mb-3 col-md-4">
-            
-            <span class="col-form-label" style="margin-right: 1%;" id="basic-addon1">Title:</span>
-            <input class="input-group-text" name="title" type="text" placeholder="Image Title..." id="title" required></input>
-        </div>
-        <div class="input-group mb-3 col-md-4">
-            <input name="image" type="file" accept="image/*" required class="form-control" id="inputGroupFile02">
-            <button class="input-group-text" type="submit" for="inputGroupFile02">Upload</button>
-        </div>
+<div class="upload-container">
+    <div>
+        <h2 class="upload-title">Upload a new photo</h2>
     </div>
-</form>
+    <div>
+        <form class="form-control" style="margin-top: 3%;" method="POST" action="/upload" enctype="multipart/form-data">
+            <div class="row">
+                <div class="input-group mb-3 col-md-4">
+
+                    <span class="col-form-label" style="margin-right: 1%;" id="basic-addon1">Title:</span>
+                    <input class="input-group-text" name="title" type="text" placeholder="Image Title..." id="title"
+                        required></input>
+                </div>
+                <div class="input-group mb-3 col-md-4">
+                    <input name="image" type="file" accept="image/*" required class="form-control"
+                        id="inputGroupFile02">
+                    <button class="input-group-text" type="submit" for="inputGroupFile02">Upload</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
 
 {% endblock %}
