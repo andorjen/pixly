@@ -73,14 +73,14 @@ def add_image():
 
         original_file = PILImage.open(file)
         original_file.thumbnail((400, 400))
-        original_file.save(f"./static/resized_file.{file_ext}")
+        original_file.save(f"./temp/resized_file.{file_ext}")
 
         s3.upload_file(
-            f"./static/resized_file.{file_ext}", "pixly-alien-j", f"{image_title}-{image_id}",
+            f"./temp/resized_file.{file_ext}", "pixly-alien-j", f"{image_title}-{image_id}",
             ExtraArgs={"ACL": "public-read"})
 
         # s3.upload_file(
-        #     f"./static/resized_file.{file_ext}", "pix.ly-eaa", f"{image_title}-{image_id}",
+        #     f"./temp/resized_file.{file_ext}", "pix.ly-eaa", f"{image_title}-{image_id}",
         #     ExtraArgs={"ACL": "public-read"})
 
         image = Image(
@@ -121,49 +121,49 @@ def show_image(id):
     image_data = Image.query.get_or_404(id)
     form_data = request.args.to_dict()
 
-    newpath = f"./static/{id}"
+    newpath = f"./temp/{id}"
 
     if not os.path.exists(newpath):
 
-        shutil.rmtree("./static")
-        os.makedirs("./static")
+        shutil.rmtree("./temp")
+        os.makedirs("./temp")
         os.makedirs(newpath)
         urllib.request.urlretrieve(
-            image_data.image_url, f"./static/{id}/original.jpeg")
+            image_data.image_url, f"./temp/{id}/original.jpeg")
         urllib.request.urlretrieve(
-            image_data.image_url, f"./static/{id}/edited.jpeg")
+            image_data.image_url, f"./temp/{id}/edited.jpeg")
 
     if "filter" in form_data:
-        image = PILImage.open(f"./static/{id}/edited.jpeg")
+        image = PILImage.open(f"./temp/{id}/edited.jpeg")
 
         image_rot_90 = image.convert('L')
-        image_rot_90.save(f"./static/{id}/edited.jpeg")
+        image_rot_90.save(f"./temp/{id}/edited.jpeg")
 
     if "rotate" in form_data:
-        image = PILImage.open(f"./static/{id}/edited.jpeg")
+        image = PILImage.open(f"./temp/{id}/edited.jpeg")
 
         image_rot_90 = image.rotate(90, expand=True)
-        image_rot_90.save(f"./static/{id}/edited.jpeg")
+        image_rot_90.save(f"./temp/{id}/edited.jpeg")
 
     if "mirror" in form_data:
-        image = PILImage.open(f"./static/{id}/edited.jpeg")
+        image = PILImage.open(f"./temp/{id}/edited.jpeg")
         flipped_image = image.transpose(PILImage.FLIP_LEFT_RIGHT)
-        flipped_image.save(f"./static/{id}/edited.jpeg")
+        flipped_image.save(f"./temp/{id}/edited.jpeg")
 
     if "contrast" in form_data:
-        image = PILImage.open(f"./static/{id}/edited.jpeg")
+        image = PILImage.open(f"./temp/{id}/edited.jpeg")
         contrast = ImageEnhance.Contrast(image)
-        contrast.enhance(1.5).save(f"./static/{id}/edited.jpeg")
+        contrast.enhance(1.5).save(f"./temp/{id}/edited.jpeg")
 
     if "border" in form_data:
-        image = PILImage.open(f"./static/{id}/edited.jpeg")
+        image = PILImage.open(f"./temp/{id}/edited.jpeg")
         border_image = ImageOps.expand(
             image, border=(10, 10, 10, 10), fill="black")
-        border_image.save(f"./static/{id}/edited.jpeg")
+        border_image.save(f"./temp/{id}/edited.jpeg")
 
     if "revert" in form_data:
         urllib.request.urlretrieve(
-            image_data.image_url, f"./static/{id}/edited.jpeg")
+            image_data.image_url, f"./temp/{id}/edited.jpeg")
 
     return render_template("image.html", image=image_data)
 
@@ -175,36 +175,36 @@ def show_image(id):
 #     # form_data = request.form.to_dict()
 
 #     if action == "filter":
-#         image = PILImage.open(f"./static/{id}/edited.jpeg")
+#         image = PILImage.open(f"./temp/{id}/edited.jpeg")
 
 #         image_rot_90 = image.convert('L')
-#         image_rot_90.save(f"./static/{id}/edited.jpeg")
+#         image_rot_90.save(f"./temp/{id}/edited.jpeg")
 
 #     if action == "rotate":
-#         image = PILImage.open(f"./static/{id}/edited.jpeg")
+#         image = PILImage.open(f"./temp/{id}/edited.jpeg")
 
 #         image_rot_90 = image.rotate(90, expand=True)
-#         image_rot_90.save(f"./static/{id}/edited.jpeg")
+#         image_rot_90.save(f"./temp/{id}/edited.jpeg")
 
 #     if action == "mirror":
-#         image = PILImage.open(f"./static/{id}/edited.jpeg")
+#         image = PILImage.open(f"./temp/{id}/edited.jpeg")
 #         flipped_image = image.transpose(PILImage.FLIP_LEFT_RIGHT)
-#         flipped_image.save(f"./static/{id}/edited.jpeg")
+#         flipped_image.save(f"./temp/{id}/edited.jpeg")
 
 #     if action == "contrast":
-#         image = PILImage.open(f"./static/{id}/edited.jpeg")
+#         image = PILImage.open(f"./temp/{id}/edited.jpeg")
 #         contrast = ImageEnhance.Contrast(image)
-#         contrast.enhance(1.5).save(f"./static/{id}/edited.jpeg")
+#         contrast.enhance(1.5).save(f"./temp/{id}/edited.jpeg")
 
 #     if action == "border":
-#         image = PILImage.open(f"./static/{id}/edited.jpeg")
+#         image = PILImage.open(f"./temp/{id}/edited.jpeg")
 #         border_image = ImageOps.expand(
 #             image, border=(10, 10, 10, 10), fill="black")
-#         border_image.save(f"./static/{id}/edited.jpeg")
+#         border_image.save(f"./temp/{id}/edited.jpeg")
 
 #     if action == "revert":
 #         urllib.request.urlretrieve(
-#             image_data.image_url, f"./static/{id}/edited.jpeg")
+#             image_data.image_url, f"./temp/{id}/edited.jpeg")
 
 #     # return redirect(f"/images/{id}")
 #     return render_template("image.html", image=image_data)
