@@ -1,6 +1,7 @@
 body {
     background-image:url("https://images.unsplash.com/photo-1577091511220-7b1f05e9c589?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80");
     background-size: cover;
+    font-family: 'Open Sans', sans-serif;
 }
 
 .images-page{
@@ -16,16 +17,19 @@ body {
 .images-container{
     columns: 4;
     column-gap: 12px;
-    background-color: rgb(255, 255, 255,0.4);
+    background-color: rgb(255, 255, 255,0.7);
 }
 .image-card{
     margin-bottom: 12px;
     break-inside: avoid;
 }
 
+.image-card-title{
+    background-color: white;
+}
 .image-title{
     text-decoration: none;
-    color:rgb(99, 171, 27);
+    color: black;
 }
 
 .upload-container{
@@ -65,4 +69,8 @@ body {
     background-color: rgba(255, 255, 255,0.8);
     border: 1px solid lightgrey; 
     border-radius: 6px;
+}
+
+.home-title{
+    font-weight: 600;
 }
