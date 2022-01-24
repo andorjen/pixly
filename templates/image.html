@@ -72,9 +72,15 @@ Pixly Home
                     </form>
                 </div>
             </div>
-            <div class="col-12">
+            <!-- <div class="col-12">
                 <a href="../static/temp/{{image.id}}/edited.jpeg" download>
                     <img style="margin-top: 5%; margin-bottom: 5%;" src="../static/temp/{{image.id}}/edited.jpeg"
+                        alt={{image.title}}>
+                </a>
+            </div> -->
+            <div class="col-12">
+                <a href=".{{temp_path}}/edited.jpeg" download>
+                    <img style="margin-top: 5%; margin-bottom: 5%;" src=".{{temp_path}}/edited.jpeg"
                         alt={{image.title}}>
                 </a>
             </div>
