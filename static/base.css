@@ -14,19 +14,42 @@ body {
     margin-top:20px;
     margin-bottom:20px;
 }
-.images-container{
-    columns: 4;
-    column-gap: 12px;
-    background-color: rgb(255, 255, 255,0.7);
+
+@media(max-width:300px){
+    .card-body{
+       display: none;
+    }
 }
+
+@media(min-width:500px){
+    .images-container{
+        columns: 2;
+        column-gap: 12px;
+        background-color: rgb(255, 255, 255,0.7);
+    }
+}
+@media(min-width:600px){
+    .images-container{
+        columns: 3;
+        column-gap: 12px;
+        background-color: rgb(255, 255, 255,0.7);
+    }
+}
+
+@media(min-width:900px){
+    .images-container{
+        columns: 4;
+        column-gap: 12px;
+        background-color: rgb(255, 255, 255,0.7);
+    }
+}
+
 .image-card{
     margin-bottom: 12px;
     break-inside: avoid;
 }
 
-.image-card-title{
-    background-color: white;
-}
+
 .image-title{
     text-decoration: none;
     color: black;
